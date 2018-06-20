@@ -423,6 +423,7 @@ func (s *state) newValue1A(op ssa.Op, t *types.Type, aux interface{}, arg *ssa.V
 // isStmt determines whether the created values may be a statement or not
 // (i.e., false means never, yes means maybe).
 func (s *state) newValue1Apos(op ssa.Op, t *types.Type, aux interface{}, arg *ssa.Value, isStmt bool) *ssa.Value {
+	panic("----------")
 	if isStmt {
 		return s.curBlock.NewValue1A(s.peekPos(), op, t, aux, arg)
 	}
@@ -463,6 +464,7 @@ func (s *state) newValue3A(op ssa.Op, t *types.Type, aux interface{}, arg0, arg1
 // isStmt determines whether the created values may be a statement or not
 // (i.e., false means never, yes means maybe).
 func (s *state) newValue3Apos(op ssa.Op, t *types.Type, aux interface{}, arg0, arg1, arg2 *ssa.Value, isStmt bool) *ssa.Value {
+	panic("----------")
 	if isStmt {
 		return s.curBlock.NewValue3A(s.peekPos(), op, t, aux, arg0, arg1, arg2)
 	}
@@ -1017,6 +1019,7 @@ func (s *state) stmt(n *Node) {
 		// varkill in the store chain is enough to keep it correctly ordered
 		// with respect to call ops.
 		if !s.canSSA(n.Left) {
+			panic("----------")
 			s.vars[&memVar] = s.newValue1Apos(ssa.OpVarKill, types.TypeMem, n.Left, s.mem(), false)
 		}
 
@@ -2358,6 +2361,7 @@ func (s *state) append(n *Node, inplace bool) *ssa.Value {
 	for i, arg := range args {
 		addr := s.newValue2(ssa.OpPtrIndex, pt, p2, s.constInt(types.Types[TINT], int64(i)))
 		if arg.store {
+			panic("----------")
 			s.storeType(et, addr, arg.v, 0, true)
 		} else {
 			s.move(et, addr, arg.v)
@@ -2508,6 +2512,7 @@ func (s *state) assign(left *Node, right *ssa.Value, deref bool, skip skipMask) 
 	// Left is not ssa-able. Compute its address.
 	addr := s.addr(left, false)
 	if left.Op == ONAME && left.Class() != PEXTERN && skip == 0 {
+		panic("----------")
 		s.vars[&memVar] = s.newValue1Apos(ssa.OpVarDef, types.TypeMem, left, s.mem(), !left.IsAutoTmp())
 	}
 	if isReflectHeaderDataField(left) {
@@ -2528,6 +2533,7 @@ func (s *state) assign(left *Node, right *ssa.Value, deref bool, skip skipMask) 
 		return
 	}
 	// Treat as a store.
+	panic("----------")
 	s.storeType(t, addr, right, skip, !left.IsAutoTmp())
 }
 
@@ -3511,6 +3517,7 @@ func (s *state) addr(n *Node, bounded bool) *ssa.Value {
 			s.Fatalf("addr of undeclared ONAME %v. declared: %v", n, s.decladdrs)
 			return nil
 		case PAUTO:
+			panic("----------")
 			return s.newValue1Apos(ssa.OpAddr, t, n, s.sp, !n.IsAutoTmp())
 		case PPARAMOUT: // Same as PAUTO -- cannot generate LEA early.
 			// ensure that we reuse symbols for out parameters so
@@ -3798,6 +3805,7 @@ func (s *state) rtcall(fn *obj.LSym, returns bool, results []*types.Type, args .
 
 /// do *left = right for type t.
 func (s *state) storeType(t *types.Type, left, right *ssa.Value, skip skipMask, leftIsStmt bool) {
+	panic("----------")
 	if skip == 0 && (!types.Haspointers(t) || ssa.IsStackAddr(left)) {
 		// Known to not have write barrier. Store the whole type.
 		s.vars[&memVar] = s.newValue3Apos(ssa.OpStore, types.TypeMem, t, left, right, s.mem(), leftIsStmt)
