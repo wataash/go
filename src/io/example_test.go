@@ -225,6 +225,7 @@ func ExampleMultiWriter() {
 	// some io.Reader stream to be read
 }
 
+// io.Pipe is goroutine-safe, whereas bytes.Buffer is not.
 func ExamplePipe() {
 	r, w := io.Pipe()
 

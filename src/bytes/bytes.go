@@ -23,6 +23,11 @@ func Equal(a, b []byte) bool {
 // Compare returns an integer comparing two byte slices lexicographically.
 // The result will be 0 if a==b, -1 if a < b, and +1 if a > b.
 // A nil argument is equivalent to an empty slice.
+//
+//   bytes.Compare([]byte("a"), []byte("b")) < 0  // "a" < "b"
+//   bytes.Compare([]byte("a"), []byte("a")) == 0 // "a" == "a"
+//   bytes.Compare([]byte("b"), []byte("a")) > 0  // "b" > "a"
+//
 func Compare(a, b []byte) int {
 	return bytealg.Compare(a, b)
 }

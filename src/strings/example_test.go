@@ -6,11 +6,14 @@ package strings_test
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"unicode"
 )
 
 func ExampleFields() {
+	tmp := strings.Fields("  foo bar  baz   ")
+	_ = tmp
 	fmt.Printf("Fields are: %q", strings.Fields("  foo bar  baz   "))
 	// Output: Fields are: ["foo" "bar" "baz"]
 }
@@ -24,6 +27,20 @@ func ExampleFieldsFunc() {
 }
 
 func ExampleCompare() {
+	// only for symmetry with package bytes
+
+	var tmp bool
+	_ = tmp
+	tmp = 1 < 2     // true
+	tmp = "a" < "b" // true
+
+	var tmpi int
+	_ = tmpi
+	//                        > -> 1
+	tmpi = strings.Compare("a", "b") // -1
+	tmpi = strings.Compare("a", "a") // 0
+	tmpi = strings.Compare("b", "a") // 1
+
 	fmt.Println(strings.Compare("a", "b"))
 	fmt.Println(strings.Compare("a", "a"))
 	fmt.Println(strings.Compare("b", "a"))
@@ -80,11 +97,19 @@ func ExampleCount() {
 }
 
 func ExampleEqualFold() {
+	var tmp bool
+	_ = tmp
+	tmp = strings.EqualFold("あ", "ア") // false
+	tmp = strings.EqualFold("ア", "ァ") // false
+	tmp = strings.EqualFold("ア", "ｱ") // false
+
 	fmt.Println(strings.EqualFold("Go", "go"))
 	// Output: true
 }
 
 func ExampleHasPrefix() {
+	// startWith; startsWith; start with; starts with
+	// beginWith; beginsWith; begin with; begins with
 	fmt.Println(strings.HasPrefix("Gopher", "Go"))
 	fmt.Println(strings.HasPrefix("Gopher", "C"))
 	fmt.Println(strings.HasPrefix("Gopher", ""))
@@ -95,6 +120,7 @@ func ExampleHasPrefix() {
 }
 
 func ExampleHasSuffix() {
+	// endWith; endsWith; end with; ends with
 	fmt.Println(strings.HasSuffix("Amigo", "go"))
 	fmt.Println(strings.HasSuffix("Amigo", "O"))
 	fmt.Println(strings.HasSuffix("Amigo", "Ami"))
@@ -126,6 +152,7 @@ func ExampleIndexFunc() {
 }
 
 func ExampleIndexAny() {
+	//                              _  _
 	fmt.Println(strings.IndexAny("chicken", "aeiouy"))
 	fmt.Println(strings.IndexAny("crwth", "aeiouy"))
 	// Output:
@@ -134,6 +161,10 @@ func ExampleIndexAny() {
 }
 
 func ExampleIndexByte() {
+	// error: constant 19990 overflows byte
+	// tmp := strings.IndexByte("こんにちは世界", '世')
+	// _ = tmp
+
 	fmt.Println(strings.IndexByte("golang", 'g'))
 	fmt.Println(strings.IndexByte("gophers", 'h'))
 	fmt.Println(strings.IndexByte("golang", 'x'))
@@ -143,6 +174,22 @@ func ExampleIndexByte() {
 	// -1
 }
 func ExampleIndexRune() {
+	var a rune
+	a = 'a' // goland: a: rune
+	t := reflect.TypeOf(a)
+	tn := t.Name() // "int32"
+	_ = tn
+
+	b := 'b' // int32 (not byte)
+	t = reflect.TypeOf(b)
+	tn = t.Name()
+
+	bb := byte(b)
+	_ = bb
+
+	tmp := strings.IndexRune("こんにちは世界", '世')
+	_ = tmp
+
 	fmt.Println(strings.IndexRune("chicken", 'k'))
 	fmt.Println(strings.IndexRune("chicken", 'd'))
 	// Output:
@@ -151,7 +198,9 @@ func ExampleIndexRune() {
 }
 
 func ExampleLastIndex() {
+	//                         __
 	fmt.Println(strings.Index("go gopher", "go"))
+	//                                __
 	fmt.Println(strings.LastIndex("go gopher", "go"))
 	fmt.Println(strings.LastIndex("go gopher", "rodent"))
 	// Output:
@@ -161,7 +210,9 @@ func ExampleLastIndex() {
 }
 
 func ExampleLastIndexAny() {
+	//                                    _
 	fmt.Println(strings.LastIndexAny("go gopher", "go"))
+	//                                        _
 	fmt.Println(strings.LastIndexAny("go gopher", "rodent"))
 	fmt.Println(strings.LastIndexAny("go gopher", "fail"))
 	// Output:
@@ -203,6 +254,7 @@ func ExampleRepeat() {
 
 func ExampleReplace() {
 	fmt.Println(strings.Replace("oink oink oink", "k", "ky", 2))
+	// ReplaceAll
 	fmt.Println(strings.Replace("oink oink oink", "oink", "moo", -1))
 	// Output:
 	// oinky oinky oink
@@ -210,12 +262,14 @@ func ExampleReplace() {
 }
 
 func ExampleReplaceAll() {
+	// Replace(s, old, new, -1)
 	fmt.Println(strings.ReplaceAll("oink oink oink", "oink", "moo"))
 	// Output:
 	// moo moo moo
 }
 
 func ExampleSplit() {
+	// SplitN(s, sep, -1)
 	fmt.Printf("%q\n", strings.Split("a,b,c", ","))
 	fmt.Printf("%q\n", strings.Split("a man a plan a canal panama", "a "))
 	fmt.Printf("%q\n", strings.Split(" xyz ", ""))
@@ -348,6 +402,13 @@ func ExampleTrimFunc() {
 }
 
 func ExampleTrimLeft() {
+	var tmp string
+	_ = tmp
+	tmp = strings.TrimLeft("¡¡¡Hello, Gophers!!!", "H")     // ¡¡¡Hello, Gophers!!!
+	tmp = strings.TrimLeft("¡¡¡Hello, Gophers!!!", "H¡")    //     ello, Gophers!!!
+	tmp = strings.TrimLeft("¡¡¡Hello, Gophers!!!", "eH¡o")  //      llo, Gophers!!!
+	tmp = strings.TrimLeft("¡¡¡Hello, Gophers!!!", "eH¡ol") //         , Gophers!!!
+
 	fmt.Print(strings.TrimLeft("¡¡¡Hello, Gophers!!!", "!¡"))
 	// Output: Hello, Gophers!!!
 }

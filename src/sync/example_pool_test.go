@@ -18,6 +18,7 @@ var bufPool = sync.Pool{
 		// types, since a pointer can be put into the return interface
 		// value without an allocation:
 		return new(bytes.Buffer)
+		// return &bytes.Buffer{} // same? does it zero-initialization?
 	},
 }
 
@@ -41,5 +42,10 @@ func Log(w io.Writer, key, val string) {
 
 func ExamplePool() {
 	Log(os.Stdout, "path", "/search?q=flowers")
+
+	// no New()
+	// Log(os.Stdout, "path", "/search?q=flowers2")
+	// Log(os.Stdout, "path", "/search?q=flowers3")
+
 	// Output: 2006-01-02T15:04:05Z path=/search?q=flowers
 }

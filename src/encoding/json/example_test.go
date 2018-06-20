@@ -14,6 +14,22 @@ import (
 	"strings"
 )
 
+func Example_wataash_Unmarshal_non_array() {
+	var jsonBlob = []byte(`{"Name": "Platypus", "Order": "Monotremata"}`)
+
+	type Animal struct {
+		Name  string
+		Order string
+	}
+	var a Animal
+	err := json.Unmarshal(jsonBlob, &a)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Printf("%+v", a)
+	// Output: {Name:Platypus Order:Monotremata}
+}
+
 func ExampleMarshal() {
 	type ColorGroup struct {
 		ID     int
@@ -228,6 +244,7 @@ func ExampleRawMessage_marshal() {
 	}{Header: &h, Body: "Hello Gophers!"}
 
 	b, err := json.MarshalIndent(&c, "", "\t")
+	b, err = json.MarshalIndent(c, "", "\t") // same
 	if err != nil {
 		fmt.Println("error:", err)
 	}

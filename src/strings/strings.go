@@ -441,11 +441,14 @@ func Join(elems []string, sep string) string {
 }
 
 // HasPrefix tests whether the string s begins with prefix.
+// startWith; startsWith; start with; starts with
+// beginWith; beginsWith; begin with; begins with
 func HasPrefix(s, prefix string) bool {
 	return len(s) >= len(prefix) && s[0:len(prefix)] == prefix
 }
 
 // HasSuffix tests whether the string s ends with suffix.
+// endWith; endsWith; end with; ends with
 func HasSuffix(s, suffix string) bool {
 	return len(s) >= len(suffix) && s[len(s)-len(suffix):] == suffix
 }

@@ -5,9 +5,11 @@
 package http_test
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -24,6 +26,15 @@ func (h *countHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func ExampleHandle() {
+	out := os.Stdout
+	os.Stdout = os.Stderr
+	defer func() { os.Stdout = out }()
+	// http://localhost:8080/count
+
 	http.Handle("/count", new(countHandler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	log.Fatal(nil)
+	log.Fatal(errors.New("foo"))
+	// // Output:
 }

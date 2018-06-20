@@ -223,10 +223,18 @@ func quickSort(data Interface, a, b, maxDepth int) {
 	}
 }
 
+// dows it work?
+func SortP(data *Interface) {
+	n := (*data).Len()
+	quickSort(*data, 0, n, maxDepth(n))
+}
+
 // Sort sorts data.
 // It makes one call to data.Len to determine n and O(n*log(n)) calls to
 // data.Less and data.Swap. The sort is not guaranteed to be stable.
 func Sort(data Interface) {
+	//         ^^^^^^^^^ non pointer, but destructive
+	//                   since interface has pointer to actual data
 	n := data.Len()
 	quickSort(data, 0, n, maxDepth(n))
 }

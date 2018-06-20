@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// goland: os.Stdin.Read() returns io.EOF. Do remote debug to avoid this:
+// dlv test --headless --listen=:2345 --api-version=2 bufio -- -test.run '^Example'
+// see ExampleWataAshOs() for details
+
 package bufio_test
 
 import (
@@ -13,6 +17,7 @@ import (
 )
 
 func ExampleWriter() {
+	// os.Stdout = os.Stderr
 	w := bufio.NewWriter(os.Stdout)
 	fmt.Fprint(w, "Hello, ")
 	fmt.Fprint(w, "world!")
@@ -23,12 +28,17 @@ func ExampleWriter() {
 // The simplest use of a Scanner, to read standard input as a set of lines.
 func ExampleScanner_lines() {
 	scanner := bufio.NewScanner(os.Stdin)
+	// ctrl+D to EOF
+	println("ExampleScanner_lines(): scan")
 	for scanner.Scan() {
 		fmt.Println(scanner.Text()) // Println will add back the final '\n'
+		n, err := fmt.Fprintf(os.Stderr, "scanner.Text(): %s\n", scanner.Text())
+		_, _ = n, err
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
+	// // Output: your inputs
 }
 
 // Return the most recent call to Scan as a []byte.
@@ -51,10 +61,12 @@ func ExampleScanner_words() {
 	const input = "Now is the winter of our discontent,\nMade glorious summer by this sun of York.\n"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	// Set the split function for the scanning operation.
+	// default: scanner.split = bufio.ScanLines
 	scanner.Split(bufio.ScanWords)
 	// Count the words.
 	count := 0
 	for scanner.Scan() {
+		// println("text:", scanner.Text())
 		count++
 	}
 	if err := scanner.Err(); err != nil {

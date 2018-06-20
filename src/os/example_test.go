@@ -13,6 +13,45 @@ import (
 	"time"
 )
 
+// goland remote debug tesgo:
+//   dlv debug --headless --listen=:2345 --api-version=2 github.com/wataash/tesgo
+// goland remote test os:
+//   dlv test --headless --listen=:2345 --api-version=2 os -- -test.run '^Example'
+//
+// TODO: without goland: dlv {debug, test}
+//
+// EBADF0: &os.PathError{"read", "/dev/stdin", syscall.EBADF}
+// EBADF1: &os.PathError{"read", "/dev/stdout", syscall.EBADF}
+// EBADF2: &os.PathError{"read", "/dev/stderr", syscall.EBADF}
+// EBADF|1: &os.PathError{"read", "|1", syscall.EBADF}
+//
+//                 goland debug tesgo  goland test os  goland remote debug tesgo  goland remote test os
+// os.Stdin.name:  "/dev/stdin"        "/dev/stdin"    "/dev/stdin"               "/dev/stdin"
+// os.Stdout.name: "/dev/stdout"       "|1"            "/dev/stdout"              "/dev/stdout"
+// os.Stderr.name: "/dev/stderr"       "/dev/detout"   "/dev/stderr"              "/dev/stderr"
+// in.Write        0, EBADF0           0, EBADF0       15, nil                    15, nil
+// out.Write       16, nil             16(piped), nil  16, nil                    16(piped), nil
+// err.Write       16, nil             16, nil         16, nil                    16, nil
+// in.Read         io.EOF              io.EOF          n(block), nil              n(block), nil
+// out.Read        0, EBADF1           0, EBADF|1      n(block), nil              0, EBADF|1
+// err.Read        0, EBADF2           0, EBADF2       n(block), nil              n(block), nil
+func ExampleWataAshOs() {
+	var n int
+	var err error
+
+	n, err = os.Stdin.Write([]byte("os.Stdin.Write\n"))
+	n, err = os.Stdout.Write([]byte("os.Stdout.Write\n"))
+	n, err = os.Stderr.Write([]byte("os.Stderr.Write\n"))
+
+	b := make([]byte, 100)
+	n, err = os.Stdin.Read(b)
+	n, err = os.Stdout.Read(b)
+	n, err = os.Stderr.Read(b)
+
+	_, _ = n, err
+	// Output:
+}
+
 func ExampleOpenFile() {
 	f, err := os.OpenFile("notes.txt", os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {

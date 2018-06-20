@@ -14,6 +14,12 @@ import (
 )
 
 func Example_minimal() {
+	// os.Stdout = os.Stderr
+	// err := os.Mkdir("/tmp/go_tar/", 0700)
+	// f, err := os.Create("/tmp/go_tar/go_tar.tar")
+	// _ = err
+	// tw := tar.NewWriter(f)
+
 	// Create and add some files to the archive.
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)

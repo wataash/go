@@ -36,6 +36,8 @@ type interval []time.Duration
 // String is the method to format the flag's value, part of the flag.Value interface.
 // The String method's output will be used in diagnostics.
 func (i *interval) String() string {
+	ret := fmt.Sprint(*i)
+	_ = ret
 	return fmt.Sprint(*i)
 }
 
@@ -49,6 +51,8 @@ func (i *interval) Set(value string) error {
 	//	-deltaT 10s -deltaT 15s
 	// and other combinations.
 	if len(*i) > 0 {
+		ret := errors.New("interval flag already set")
+		_ = ret
 		return errors.New("interval flag already set")
 	}
 	for _, dt := range strings.Split(value, ",") {
@@ -74,6 +78,12 @@ func init() {
 }
 
 func Example() {
+	// flag.Parse()
+	// s := *species
+	// g := gopherType
+	// _, _ = s, g
+	// fmt.Println("main exit")
+
 	// All the interesting pieces are with the variables declared above, but
 	// to enable the flag package to see the flags defined there, one must
 	// execute, typically at the start of main (not init!):

@@ -15,6 +15,27 @@ import (
 
 func ExampleKind() {
 	for _, v := range []interface{}{"hi", 42, func() {}} {
+		reflect.ValueOf(v)
+		reflect.ValueOf(v).Kind() // String(24) Int(2) Func(19)
+		_ = reflect.ValueOf(v).String()  // "hi" "<int Value>" "<func() Value>"
+		// reflect.ValueOf(v).Int()  // panic
+
+		// TODO
+		// reflect.ValueOf(v).Addr()
+		// reflect.ValueOf(v).Bool()
+		// reflect.ValueOf(v).Bytes()
+		// reflect.ValueOf(v).Call()
+		// reflect.ValueOf(v).CallSlice()
+		// reflect.ValueOf(v).Convert()
+		// reflect.ValueOf(v).Field()
+		// reflect.ValueOf(v).FieldByIndex()
+		// reflect.ValueOf(v).FieldByName()
+		// reflect.ValueOf(v).FieldByNameFunc()
+		// reflect.ValueOf(v).Index()
+		// reflect.ValueOf(v).Int()
+		// reflect.ValueOf(v).Interface()
+	}
+	for _, v := range []interface{}{"hi", 42, func() {}} {
 		switch v := reflect.ValueOf(v); v.Kind() {
 		case reflect.String:
 			fmt.Println(v.String())
@@ -46,6 +67,10 @@ func ExampleMakeFunc() {
 	// into Values, calls swap, and then turns swap's result slice
 	// into the values returned by the new function.
 	makeSwap := func(fptr interface{}) {
+		tmp := reflect.ValueOf(fptr)
+		tmpfn := tmp.Elem()
+		tmpT := tmpfn.Type()
+		_ = tmpT
 		// fptr is a pointer to a function.
 		// Obtain the function value itself (likely nil) as a reflect.Value
 		// so that we can query its type and then set the value.
@@ -116,6 +141,11 @@ func ExampleStructTag_Lookup() {
 }
 
 func ExampleTypeOf() {
+	tmp := reflect.TypeOf((*io.Writer)(nil))
+	tmp2 := tmp.Elem()
+	_ = tmp2
+	// tmp3 := tmp2.Elem() // panic
+	// _ = tmp3
 	// As interface types are only used for static typing, a
 	// common idiom to find the reflection Type for an interface
 	// type Foo is to use a *Foo value.

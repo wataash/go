@@ -17,6 +17,9 @@ const smallBufferSize = 64
 
 // A Buffer is a variable-sized buffer of bytes with Read and Write methods.
 // The zero value for Buffer is an empty buffer ready to use.
+//
+// not goroutine-safe, whereas io.Pipe is.
+// https://stackoverflow.com/a/25950406/4085441
 type Buffer struct {
 	buf      []byte // contents are the bytes buf[off : len(buf)]
 	off      int    // read at &buf[off], write at &buf[len(buf)]

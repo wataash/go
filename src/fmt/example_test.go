@@ -13,6 +13,23 @@ import (
 	"time"
 )
 
+func Example_wataash_fmt_interface() {
+	i := interface{}(42)
+	s := interface{}("foo")
+	fmt.Printf(" s %s   %s .\n", i, s)
+	fmt.Printf(" v %v   %v .\n", i, s)
+	fmt.Printf("#v %#v %#v .\n", i, s)
+	fmt.Printf("+v %+v %+v .\n", i, s) // %+v doesn't make sense for non struct
+	fmt.Printf(" q %q   %q .\n", i, s)
+
+	// Output:
+	//  s %!s(int=42)   foo .
+	//  v 42   foo .
+	// #v 42 "foo" .
+	// +v 42 foo .
+	//  q '*'   "foo" .
+}
+
 // The Errorf function lets us use formatting features
 // to create descriptive error messages.
 func ExampleErrorf() {

@@ -10,9 +10,16 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 )
 
+var _ = os.Stdout
+
 func ExampleResponseRecorder() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "<html><body>Hello World!</body></html>")
 	}
@@ -35,6 +42,10 @@ func ExampleResponseRecorder() {
 }
 
 func ExampleServer() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
 	}))
@@ -77,6 +88,10 @@ func ExampleServer_hTTP2() {
 }
 
 func ExampleNewTLSServer() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
 	}))

@@ -12,10 +12,17 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 )
 
+var _ = os.Stdout
+
 func ExampleDumpRequest() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		dump, err := httputil.DumpRequest(r, true)
 		if err != nil {
@@ -51,6 +58,10 @@ func ExampleDumpRequest() {
 }
 
 func ExampleDumpRequestOut() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	const body = "Go is a general-purpose language designed with systems programming in mind."
 	req, err := http.NewRequest("PUT", "http://www.example.org", strings.NewReader(body))
 	if err != nil {
@@ -69,6 +80,10 @@ func ExampleDumpRequestOut() {
 }
 
 func ExampleDumpResponse() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	const body = "Go is a general-purpose language designed with systems programming in mind."
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Date", "Wed, 19 Jul 1972 19:00:00 GMT")
@@ -94,6 +109,10 @@ func ExampleDumpResponse() {
 }
 
 func ExampleReverseProxy() {
+	// out := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = out }()
+
 	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "this call was relayed by the reverse proxy")
 	}))

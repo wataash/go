@@ -34,7 +34,7 @@ func ExampleMatch() {
 	matched, err = regexp.Match(`a(b`, []byte(`seafood`))
 	fmt.Println(matched, err)
 
-	// Output:
+	// _Output:
 	// true <nil>
 	// false <nil>
 	// false error parsing regexp: missing closing ): `a(b`
@@ -63,7 +63,7 @@ func ExampleRegexp_Find() {
 	re := regexp.MustCompile(`foo.?`)
 	fmt.Printf("%q\n", re.Find([]byte(`seafood fool`)))
 
-	// Output:
+	// Output_:
 	// "food"
 }
 
@@ -71,7 +71,7 @@ func ExampleRegexp_FindAll() {
 	re := regexp.MustCompile(`foo.?`)
 	fmt.Printf("%q\n", re.FindAll([]byte(`seafood fool`), -1))
 
-	// Output:
+	// Output_:
 	// ["food" "fool"]
 }
 
@@ -79,7 +79,7 @@ func ExampleRegexp_FindAllSubmatch() {
 	re := regexp.MustCompile(`foo(.?)`)
 	fmt.Printf("%q\n", re.FindAllSubmatch([]byte(`seafood fool`), -1))
 
-	// Output:
+	// Output_:
 	// [["food" "d"] ["fool" "l"]]
 }
 
@@ -87,7 +87,7 @@ func ExampleRegexp_FindSubmatch() {
 	re := regexp.MustCompile(`foo(.?)`)
 	fmt.Printf("%q\n", re.FindSubmatch([]byte(`seafood fool`)))
 
-	// Output:
+	// Output_:
 	// ["food" "d"]
 }
 
@@ -96,7 +96,7 @@ func ExampleRegexp_Match() {
 	fmt.Println(re.Match([]byte(`seafood fool`)))
 	fmt.Println(re.Match([]byte(`something else`)))
 
-	// Output:
+	// Output_:
 	// true
 	// false
 }
@@ -147,6 +147,46 @@ func ExampleRegexp_FindAllStringSubmatch() {
 	fmt.Printf("%q\n", re.FindAllStringSubmatch("-axxb-", -1))
 	fmt.Printf("%q\n", re.FindAllStringSubmatch("-ab-axb-", -1))
 	fmt.Printf("%q\n", re.FindAllStringSubmatch("-axxb-ab-", -1))
+
+	re = regexp.MustCompile(`a(x*)(y*)b`)
+	// [["axxyb" "xx" "y"] ["ab" "" ""]]
+	tmp := re.FindAllStringSubmatch("-axxyb-ab-", -1)
+	//                                ^^^^^ ^^ tmp[0,1][0]
+	//                                 xxy     tmp[0,1][1,2]
+
+	// multiline
+	// [["axxyb" "xx" "y"] ["axxxxyyb" "xxxx" "yy"]]
+	tmp = re.FindAllStringSubmatch("-axxyb\naxxxxyyb-", -1)
+
+	// https://github.com/google/re2/wiki/Syntax - flags
+	// ?m: multi-line mode
+	re = regexp.MustCompile(`^a(x*)(y*)b$`)
+	tmp = re.FindAllStringSubmatch("axxyb", -1)        // [["axxyb" "xx" "y"]]
+	tmp = re.FindAllStringSubmatch("axxyb\naxxyb", -1) // nil
+	re = regexp.MustCompile(`(?m)^a(x*)(y*)b$`)        // [["axxyb" "xx" "y"]]
+	tmp = re.FindAllStringSubmatch("axxyb", -1)
+	tmp = re.FindAllStringSubmatch("axxyb\naxxyb", -1) // [["axxyb" "xx" "y"] * 2]
+
+	// ?s: let . match \n
+	re = regexp.MustCompile(`(?s)aaa(.+)bbb`)
+	tmp = re.FindAllStringSubmatch("aaa\nfoo\nbbb", -1) // [0][1]: \nfoo\n
+	re = regexp.MustCompile(`^(?s)aaa(.+)bbb$`)
+	tmp = re.FindAllStringSubmatch("aaa\nfoo\nbbb", -1) // [0][1]: \nfoo\n (?m not needed)
+	re = regexp.MustCompile(`^(?ms)aaa(.+)bbb$`)
+	tmp = re.FindAllStringSubmatch("aaa\nfoo\nbbb", -1) // [0][1]: \nfoo\n
+
+	// ?U: ungreedy
+	txt := `aaa
+foo
+bar
+aaa
+baz`
+	re = regexp.MustCompile(`(?msU)^aaa(.+)$`)
+	tmp = re.FindAllStringSubmatch(txt, -1) // aaa\nfoo aaa\baz
+	// aaa\nfoo\nbar aaa\nbaz impossible?
+
+	_ = tmp
+
 	// Output:
 	// [["ab" ""]]
 	// [["axxb" "xx"]]
@@ -159,7 +199,15 @@ func ExampleRegexp_FindAllStringSubmatchIndex() {
 	// Indices:
 	//    01234567   012345678
 	//    -ab-axb-   -axxb-ab-
+
+	// 0 1  2  3 4
+	//  - a   b -
+	//   1     3
+	//     2 2
 	fmt.Println(re.FindAllStringSubmatchIndex("-ab-", -1))
+	// - a x x b -
+	//  1       5
+	//    2   4
 	fmt.Println(re.FindAllStringSubmatchIndex("-axxb-", -1))
 	fmt.Println(re.FindAllStringSubmatchIndex("-ab-axb-", -1))
 	fmt.Println(re.FindAllStringSubmatchIndex("-axxb-ab-", -1))
@@ -341,7 +389,7 @@ func ExampleRegexp_Expand() {
 		result = pattern.Expand(result, template, content, submatches)
 	}
 	fmt.Println(string(result))
-	// Output:
+	// Output_:
 	// option1=value1
 	// option2=value2
 	// option3=value3
@@ -357,6 +405,7 @@ func ExampleRegexp_ExpandString() {
 	option3: value3
 `
 
+	// ?m: https://github.com/google/re2/wiki/Syntax - flags
 	// Regex pattern captures "key: value" pair from the content.
 	pattern := regexp.MustCompile(`(?m)(?P<key>\w+):\s+(?P<value>\w+)$`)
 
@@ -367,7 +416,8 @@ func ExampleRegexp_ExpandString() {
 	result := []byte{}
 
 	// For each match of the regex in the content.
-	for _, submatches := range pattern.FindAllStringSubmatchIndex(content, -1) {
+	for tmp, submatches := range pattern.FindAllStringSubmatchIndex(content, -1) {
+		_ = tmp
 		// Apply the captured submatches to the template and append the output
 		// to the result.
 		result = pattern.ExpandString(result, template, content, submatches)

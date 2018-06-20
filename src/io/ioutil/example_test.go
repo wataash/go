@@ -34,8 +34,10 @@ func ExampleReadDir() {
 	}
 
 	for _, file := range files {
-		fmt.Println(file.Name())
+		fmt.Fprintln(os.Stderr, file.Name())
 	}
+
+	// Output:
 }
 
 func ExampleTempDir() {
@@ -51,6 +53,11 @@ func ExampleTempDir() {
 	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
 		log.Fatal(err)
 	}
+
+	b, err := ioutil.ReadFile(tmpfn)
+	_, _ = b, err
+
+	// Output:
 }
 
 func ExampleTempDir_suffix() {
@@ -91,6 +98,8 @@ func ExampleTempFile() {
 	if err := tmpfile.Close(); err != nil {
 		log.Fatal(err)
 	}
+
+	// Output:
 }
 
 func ExampleTempFile_suffix() {
@@ -109,6 +118,8 @@ func ExampleTempFile_suffix() {
 	if err := tmpfile.Close(); err != nil {
 		log.Fatal(err)
 	}
+
+	// Output:
 }
 
 func ExampleReadFile() {
@@ -125,8 +136,17 @@ func ExampleReadFile() {
 
 func ExampleWriteFile() {
 	message := []byte("Hello, Gophers!")
+// <<<<<<< HEAD
 	err := ioutil.WriteFile("hello", message, 0644)
+// ||||||| parent of c44f46d04b... [d]
+// 	err := ioutil.WriteFile("testdata/hello", message, 0644)
+// =======
+// 	err := ioutil.WriteFile("testdata/hello_", message, 0644)
+// >>>>>>> c44f46d04b... [d]
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("")
+	// Output:
 }

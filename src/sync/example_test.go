@@ -6,12 +6,15 @@ package sync_test
 
 import (
 	"fmt"
+	"os"
 	"sync"
 )
 
 type httpPkg struct{}
 
-func (httpPkg) Get(url string) {}
+func (httpPkg) Get(url string) {
+	fmt.Fprintln(os.Stderr, "Get: ", url)
+}
 
 var http httpPkg
 
@@ -37,6 +40,8 @@ func ExampleWaitGroup() {
 	}
 	// Wait for all HTTP fetches to complete.
 	wg.Wait()
+
+	// Output:
 }
 
 func ExampleOnce() {

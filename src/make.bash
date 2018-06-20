@@ -184,6 +184,7 @@ rm -f cmd/dist/dist
 GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" GO111MODULE=off "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
 
 # -e doesn't propagate out of eval, so check success by hand.
+# bug on bashdb
 eval $(./cmd/dist/dist env -p || echo FAIL=true)
 if [ "$FAIL" = true ]; then
 	exit 1

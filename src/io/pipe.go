@@ -194,6 +194,9 @@ func (w *PipeWriter) CloseWithError(err error) error {
 // It is safe to call Read and Write in parallel with each other or with Close.
 // Parallel calls to Read and parallel calls to Write are also safe:
 // the individual calls will be gated sequentially.
+//
+// c.f. bytes.Buffer is not goroutine-safe.
+// https://stackoverflow.com/a/25950406/4085441
 func Pipe() (*PipeReader, *PipeWriter) {
 	p := &pipe{
 		wrCh: make(chan []byte),

@@ -65,6 +65,9 @@ func Example_customMarshalJSON() {
 	fmt.Printf("Zoo Census:\n* Gophers: %d\n* Zebras:  %d\n* Unknown: %d\n",
 		census[Gopher], census[Zebra], census[Unknown])
 
+	// b, err := json.Marshal(zoo)
+	// _, _ = b, err
+
 	// Output:
 	// Zoo Census:
 	// * Gophers: 3
