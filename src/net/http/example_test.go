@@ -80,7 +80,7 @@ func ExampleFileServer() {
 	os.Stdout = os.Stderr
 	defer func() { os.Stdout = outOrig }()
 
-	// http://localhost:8080/
+	// http -v http://localhost:8080/
 
 	tmpDir := http.Dir("/usr/share/doc") // implements http.FileSystem
 	_ = http.FileSystem.Open
@@ -101,7 +101,7 @@ func ExampleFileServer_stripPrefix() {
 	os.Stdout = os.Stderr
 	defer func() { os.Stdout = outOrig }()
 
-	// http://localhost:8080/tmpfiles/
+	// http -v http://localhost:8080/tmpfiles/
 
 	tmpHandler := http.FileServer(http.Dir("/tmp"))           // net/http.Handler | *net/http.fileHandler
 	tmpHandler2 := http.StripPrefix("/tmpfiles/", tmpHandler) // net/http.Handler |  net/http.HandlerFunc
@@ -132,15 +132,15 @@ func (handler apiHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func ExampleServeMux_Handle() {
-	// http://localhost:8080/
-	// http://localhost:8080/foo/
-	// http://localhost:8080/api/
+	// http -v http://localhost:8080/      # Welcome to the home page!
+	// http -v http://localhost:8080/foo/  # 404 page not found
+	// http -v http://localhost:8080/api/  # (apiHandler)ServeHTTP
 
 	mux := http.NewServeMux()
-	_ = (* http.ServeMux).ServeHTTP
-	_ = (* http.ServeMux).Handle
-	_ = (* http.ServeMux).HandleFunc
-	_ = (* http.ServeMux).Handler
+	_ = (*http.ServeMux).ServeHTTP
+	_ = (*http.ServeMux).Handle
+	_ = (*http.ServeMux).HandleFunc
+	_ = (*http.ServeMux).Handler
 	mux.Handle("/api/", apiHandler{})
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		// The "/" pattern matches everything, so we need to check
@@ -153,7 +153,7 @@ func ExampleServeMux_Handle() {
 	})
 
 	_ = http.ListenAndServe(":8080", mux)
-	// // Output:
+	// Output:
 }
 
 // not tried below...
@@ -161,7 +161,7 @@ func ExampleServeMux_Handle() {
 // HTTP Trailers are a set of key/value pairs like headers that come
 // after the HTTP response, instead of before.
 func ExampleResponseWriter_trailers() {
-	// http http://localhost:8080/sendstrailers
+	// http -v http://localhost:8080/sendstrailers
 	// curl -v --raw http://localhost:8080/sendstrailers
 	// only curl shows the trailers
 
