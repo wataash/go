@@ -16,9 +16,9 @@ import (
 var _ = os.Stdout
 
 func ExampleResponseRecorder() {
-	// out := os.Stdout
-	// os.Stdout = os.Stderr
-	// defer func() { os.Stdout = out }()
+	outOrig := os.Stdout
+	os.Stdout = os.Stderr
+	defer func() { os.Stdout = outOrig }()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "<html><body>Hello World!</body></html>")
@@ -26,6 +26,7 @@ func ExampleResponseRecorder() {
 
 	req := httptest.NewRequest("GET", "http://example.com/foo", nil)
 	w := httptest.NewRecorder()
+	w.Header().Set("content-type", "application/json")
 	handler(w, req)
 
 	resp := w.Result()
@@ -42,9 +43,9 @@ func ExampleResponseRecorder() {
 }
 
 func ExampleServer() {
-	// out := os.Stdout
+	// outOrig := os.Stdout
 	// os.Stdout = os.Stderr
-	// defer func() { os.Stdout = out }()
+	// defer func() { os.Stdout = outOrig }()
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
@@ -88,9 +89,9 @@ func ExampleServer_hTTP2() {
 }
 
 func ExampleNewTLSServer() {
-	// out := os.Stdout
+	// outOrig := os.Stdout
 	// os.Stdout = os.Stderr
-	// defer func() { os.Stdout = out }()
+	// defer func() { os.Stdout = outOrig }()
 
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
@@ -112,3 +113,56 @@ func ExampleNewTLSServer() {
 	fmt.Printf("%s", greeting)
 	// Output: Hello, client
 }
+fmt.Println(resp.Header.Get("Content-Type"))
+fmt.Println(string(body))
+
+// Output:
+// 200
+// text/html; charset=utf-8
+// <html><body>Hello World!</body></html>
+}
+
+func ExampleServer() {
+	// outOrig := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = outOrig }()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	greeting, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s", greeting)
+	// Output: Hello, client
+}
+
+func ExampleNewTLSServer() {
+	// outOrig := os.Stdout
+	// os.Stdout = os.Stderr
+	// defer func() { os.Stdout = outOrig }()
+
+	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	client := ts.Client()
+	res, err := client.Get(ts.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	greeting, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
