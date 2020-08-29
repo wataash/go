@@ -13,6 +13,28 @@ import (
 	"reflect"
 )
 
+// https://gist.github.com/justincase/5469009
+func Example_wataash_reflect_a() {
+	type T struct {
+		A int
+		B string
+	}
+
+	t := T{23, "skidoo"}
+	s := reflect.ValueOf(&t).Elem()
+	typeOfT := s.Type()
+
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		fmt.Printf("%d: %s %s = %v\n", i,
+			typeOfT.Field(i).Name, f.Type(), f.Interface())
+	}
+
+	// Output:
+	// 0: A int = 23
+	// 1: B string = skidoo
+}
+
 func ExampleKind() {
 	for _, v := range []interface{}{"hi", 42, func() {}} {
 		reflect.ValueOf(v)
@@ -67,10 +89,12 @@ func ExampleMakeFunc() {
 	// into Values, calls swap, and then turns swap's result slice
 	// into the values returned by the new function.
 	makeSwap := func(fptr interface{}) {
-		tmp := reflect.ValueOf(fptr)
-		tmpfn := tmp.Elem()
-		tmpT := tmpfn.Type()
-		_ = tmpT
+		reflect.ValueOf(fptr).Kind() // Ptr (22)
+		reflect.ValueOf(fptr).Type()
+		reflect.ValueOf(fptr).Type().Kind() // Ptr (22)
+		reflect.ValueOf(fptr).Elem().Kind() // Func (19)
+		reflect.ValueOf(fptr).Elem().Type()
+		reflect.ValueOf(fptr).Elem().Type().Kind() // Func (19)
 		// fptr is a pointer to a function.
 		// Obtain the function value itself (likely nil) as a reflect.Value
 		// so that we can query its type and then set the value.

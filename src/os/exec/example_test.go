@@ -21,12 +21,60 @@ import (
 	"time"
 )
 
+func Example_wataash_os_exec_filter_todo_merge() {
+	cmd := exec.Command("sed", "s/foo/bar/g")
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer func() {
+			stdin.Close()
+			wg.Done()
+		}()
+		if _, err := io.WriteString(stdin, "foo foo"); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	var b []byte
+	go func() {
+		defer func() {
+			stdout.Close()
+			wg.Done()
+		}()
+		if b, err = ioutil.ReadAll(stdout); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	wg.Wait()
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s", b)
+
+	// Output: bar bar
+}
+
 var complexCmd = "echo 1 && sleep 1 && " +
 	"echo 2 >&2 && sleep 1 && " +
 	"echo 3  >&2 && sleep 1 && " +
 	"echo 4"
 
-func Example_wataash_os_ExecStdout() {
+func Example_wataash_osExec_Stdout() {
 	cmd := exec.Command("sh", "-c", complexCmd)
 
 	cmd.Stdout = os.Stdout
@@ -40,7 +88,7 @@ func Example_wataash_os_ExecStdout() {
 }
 
 // https://tkuchiki.hatenablog.com/entry/2014/11/10/123447
-func Example_wataash_os_ExecPipe() {
+func Example_wataash_osExec_Pipe() {
 	cmd := exec.Command("sh", "-c", complexCmd)
 
 	// stdout := &bytes.Buffer{} // non-blocking in scanner.Scan
@@ -93,7 +141,7 @@ func Example_wataash_os_ExecPipe() {
 	// Output:
 }
 
-func Example_wataash_os_ExecTee() {
+func Example_wataash_osExec_Tee() {
 	cmd := exec.Command("sh", "-c", complexCmd)
 	var bufOut, bufErr bytes.Buffer
 	wg := &sync.WaitGroup{}
@@ -138,7 +186,7 @@ func Example_wataash_os_ExecTee() {
 }
 
 // http://www.albertoleal.me/posts/golang-pipes.html
-func Example_wataash_os_ExecPipeExtraFiles() {
+func Example_wataash_osExec_PipeExtraFiles() {
 	var err error
 	var n int
 	b := make([]byte, 128)
@@ -186,7 +234,7 @@ func Example_wataash_os_ExecPipeExtraFiles() {
 }
 
 // http://www.albertoleal.me/posts/golang-pipes.html
-func Example_wataash_os_ExecPipeProcfs() {
+func Example_wataash_osExec_PipeProcfs() {
 	b, err := ioutil.ReadFile("/proc/self/stat")
 
 	fd9 := os.NewFile(9, "/proc/self/fd/9")
@@ -199,7 +247,7 @@ func Example_wataash_os_ExecPipeProcfs() {
 }
 
 // http://www.albertoleal.me/posts/golang-pipes.html
-func Example_wataash_os_ExecMkFifo() {
+func Example_wataash_osExec_MkFifo() {
 	var wg sync.WaitGroup
 	tmpDir, err := ioutil.TempDir("", "named-pipes")
 	_ = err
